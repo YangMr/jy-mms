@@ -14,13 +14,16 @@ import axios from "axios";
 //创建axios实例,在axios实例里面可以自定义一些请求的选项
 const request = axios.create({
     //设置公共路径
-    baseURL : "http://localhost:8888",
+    baseURL : process.env.VUE_APP_BASE_API ,
     //设置请求的超时时间
     timeout : 5000
 });
 
 // 添加请求拦截器
 request.interceptors.request.use(function (config) {
+    const token = localStorage.getItem("yy_token") ? localStorage.getItem("yy_token") : "";
+    //发送token
+    config.headers.Authorization = token;
     console.log("请求拦截")
     // 在发送请求之前做些什么
     return config;
