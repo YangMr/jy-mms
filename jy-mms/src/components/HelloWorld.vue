@@ -1,16 +1,33 @@
 <template>
   <div class="hello">
-   
+      <ul>
+         <li v-for="(item,index) in list" :key="index">{{item.name}}</li>
+      </ul>
       <el-button type="success" icon="el-icon-check" circle></el-button>
   </div>
 </template>
 
 <script>
+import testApi from "@/api/test"
 export default {
   name: "HelloWorld",
   props: {
     msg: String
-  }
+  },
+  data : function(){
+    return {
+      list : []
+    }
+  },
+  created() {
+    // testApi.getBanner().then(res=>{
+    //   this.list = res.data;
+    //   console.log(res)
+    // });
+    // testApi.login().then(res=>{
+    //   console.log(res)
+    // })
+  },
 };
 </script>
 
