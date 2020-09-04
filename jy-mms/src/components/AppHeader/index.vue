@@ -9,12 +9,12 @@
     <div class="info">
       <el-dropdown @command="handle">
         <span class="el-dropdown-link">
-          张三
+          {{name}}
           <i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item icon="el-icon-edit" command="changePass">修改密码</el-dropdown-item>
-          <el-dropdown-item icon="el-icon-s-fold" command="chenckOut">退出系统</el-dropdown-item>
+          <el-dropdown-item icon="el-icon-s-fold" command="checkOut">退出系统</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -25,7 +25,14 @@
 export default {
   name: "",
   data() {
-    return {};
+    return {
+        name : ""
+    };
+  },
+  created() {
+      const info = JSON.parse(localStorage.getItem("jy_info"));
+      this.name = info.name !== "undefined" ? info.name : "";
+
   },
   components: {},
   methods: {
@@ -36,14 +43,22 @@ export default {
                 this.changePass();
                 break;
             case "checkOut" : 
-                this.chenckOut();
+                this.checkOut();
                 break;    
           }
       },
       changePass(){
           console.log("修改密码")
       },
-      chenckOut(){
+      checkOut(){
+          //清除本地存储的token
+          localStorage.removeItem("yy_token");
+
+          //清除本地存储的信息
+          localStorage.removeItem("jy_info");
+
+          //跳转到登录页面
+          this.$router.push("/login")
           console.log("退出登录")
       }
   },

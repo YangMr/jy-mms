@@ -52,7 +52,6 @@ export default {
         left: 240px;
         right: 0;
         top: 50px;
-        background-color: yellow;
         bottom:0;
     }
 </style>
