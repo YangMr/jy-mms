@@ -1,5 +1,6 @@
 <template>
   <div class="member">
+    <!-- 列表 -->
     <el-table :data="list" height="380" border style="width: 100%">
       <el-table-column type="index" label="序号" width="60"></el-table-column>
       <el-table-column prop="cardNum" label="会员卡号"></el-table-column>
@@ -21,6 +22,16 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页器 -->
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-sizes="[10, 20, 50]"
+      :page-size="pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+    </el-pagination>
   </div>
 </template>
 
@@ -48,7 +59,10 @@ export default {
   name: "",
   data() {
     return {
-      list: []
+      list: [],
+      currentPage : 1,
+      pageSize : 10,
+      total : 0
     };
   },
   components: {},
@@ -69,14 +83,27 @@ export default {
      handleDelete(){
 
      },
-
+     //条数改变时触发
+    handleSizeChange(cSize){
+      console.log("条数")
+      this.pageSize = cSize;
+      this.fetchData();
+    },
+    //页码改变时触发
+    handleCurrentChange(cPage){
+      console.log(cPage)
+      this.currentPage = cPage;
+      this.fetchData();
+    },
     //初始化数据
     fetchData() {
       //请求会员列表的数据
-      MemberApi.getMemberList()
+      MemberApi.getMemberListPage(this.currentPage,this.pageSize)
         .then(res => {
+          console.log(res)
           //   console.log(res);
-          this.list = res.data.data.data;
+          this.list = res.data.data.data.rows;
+          this.total = res.data.data.data.total;
           console.log(this.list);
         })
         .catch(error => {
