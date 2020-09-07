@@ -8,6 +8,7 @@ import Member from "../views/member"
 import Goods from "../views/goods"
 import Supplier from "../views/supplier"
 import Staff from "../views/staff"
+import User from "../views/user"
 Vue.use(VueRouter);
 
 const routes = [
@@ -85,6 +86,20 @@ const routes = [
           component : Staff,
           meta : {
             title : "员工功能"
+          }
+        }
+    ]
+  },
+  {
+    path : "/user",
+    name : "user",
+    component : Layout,
+    children : [
+        {
+          path : "/",
+          component : User,
+          meta : {
+            title : "用户列表"
           }
         }
     ]

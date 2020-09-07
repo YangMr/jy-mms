@@ -45,6 +45,7 @@ export default {
         left: 0;
         top: 50px;
         bottom: 0;
+        height: 100%;
         background-color:#545c64 ;
     }
     .main{
