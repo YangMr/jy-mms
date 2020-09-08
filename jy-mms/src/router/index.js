@@ -100,7 +100,8 @@ const routes = [
           path : "/",
           component : User,
           meta : {
-            title : "用户列表"
+            title : "用户列表",
+            oAuth : true
           }
         }
     ]
@@ -114,7 +115,8 @@ const routes = [
           path : "/",
           component : Student,
           meta : {
-            title : "学员管理"
+            title : "学员管理",
+            oAuth : true
           }
         }
     ]
