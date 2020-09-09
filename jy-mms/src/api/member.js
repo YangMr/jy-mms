@@ -23,5 +23,27 @@ export default {
             method : "post",
             data : data
         })
-    }
+    },
+    //删除会员接口
+    removeMember(id){
+        return request({
+            url : `/member/${id}`,
+            method : "delete"
+        })
+    },
+    //查询单条数据接口
+    findMember(id){
+        return request({
+            url : `/member/${id}`,
+            method : "get"
+        })
+    },
+    //更新某一条会员的数据接口
+    updatedMember(id,data) {
+       return request({
+           url : `/member/${id}`,
+           method : "put",
+           data : data
+       }) 
+    },
 }   

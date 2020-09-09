@@ -65,39 +65,48 @@
       :total="total"
     ></el-pagination>
     <!-- 新增对话框 -->
-    <el-dialog title="会员编辑" :visible.sync="dialogFormVisible" >
+    <el-dialog :title="title" :visible.sync="dialogFormVisible">
       <el-form ref="memberEdit" :model="form" :rules="rules" style="width:400px">
         <el-form-item label="会员卡号" prop="cardNum" :label-width="formLabelWidth">
-          <el-input v-model="form.cardNum" ></el-input>
+          <el-input v-model="form.cardNum"></el-input>
         </el-form-item>
         <el-form-item label="会员姓名" prop="name" :label-width="formLabelWidth">
-          <el-input v-model="form.name" ></el-input>
+          <el-input v-model="form.name"></el-input>
         </el-form-item>
         <el-form-item label="会员生日" prop="birthday" :label-width="formLabelWidth">
-          <el-date-picker  v-model="form.birthday" type="date" placeholder="会员生日"></el-date-picker>
+          <el-date-picker v-model="form.birthday" type="date" placeholder="会员生日"></el-date-picker>
         </el-form-item>
         <el-form-item label="手机号码" prop="phone" :label-width="formLabelWidth">
-          <el-input v-model="form.phone" ></el-input>
+          <el-input v-model="form.phone"></el-input>
         </el-form-item>
         <el-form-item label="开卡金额" prop="money" :label-width="formLabelWidth">
-          <el-input v-model="form.money" ></el-input>
+          <el-input v-model="form.money"></el-input>
         </el-form-item>
-        <el-form-item label="可用积分" prop="intergal" :label-width="formLabelWidth">
-          <el-input v-model="form.intergal" ></el-input>
+        <el-form-item label="可用积分" prop="integral" :label-width="formLabelWidth">
+          <el-input v-model="form.integral"></el-input>
         </el-form-item>
         <el-form-item label="支付类型" prop="payType" :label-width="formLabelWidth">
           <el-select v-model="form.payType" placeholder="支付类型">
-            <el-option v-for="(item,index) in payTypeValue" :label="item.name" :value="item.type" :key="index"></el-option>
+            <el-option
+              v-for="(item,index) in payTypeValue"
+              :label="item.name"
+              :value="item.type"
+              :key="index"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="会员地址" prop="address" :label-width="formLabelWidth">
-          <el-input v-model="form.address" type="textarea" ></el-input>
+          <el-input v-model="form.address" type="textarea"></el-input>
         </el-form-item>
       </el-form>
-      
+
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitData('memberEdit')">确 定</el-button>
+        <el-button
+          type="primary"
+          @click="form.id == null ? submitData('memberEdit'):updatedData('memberEdit')"
+        >确 定</el-button>
+        {{form.id}}
       </div>
     </el-dialog>
   </div>
@@ -127,29 +136,28 @@ export default {
   name: "",
   data() {
     return {
-      rules : {
-        cardNum : [
-          { required: true, message: '请输入会员卡号', trigger: 'blur' },
-          { min: 3, max: 30, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+      title: "",
+      rules: {
+        cardNum: [
+          { required: true, message: "请输入会员卡号", trigger: "blur" },
+          { min: 3, max: 30, message: "长度在 3 到 20 个字符", trigger: "blur" }
         ],
-        name : [
-          { required: true, message: '请输入会员姓名', trigger: 'blur' },
-        ],
-        payType : [
-          { required: true, message: '请选择支付方式', trigger: 'change' }
-        
+        name: [{ required: true, message: "请输入会员姓名", trigger: "blur" }],
+        payType: [
+          { required: true, message: "请选择支付方式", trigger: "change" }
         ]
       },
       formLabelWidth: "100px",
       form: {
-        cardNum : "",
-        name : "",
-        birthday : "",
-        phone : "",
-        money : 0,
-        intergal : 0,
-        payType : "",
-        address : ""
+        id: null,
+        cardNum: "",
+        name: "",
+        birthday: "",
+        phone: "",
+        money: 0,
+        integral: 0,
+        payType: "",
+        address: ""
       },
       dialogFormVisible: false,
       searchMap: {
@@ -176,33 +184,36 @@ export default {
   },
   methods: {
     //显示新增表单
-    handleAdd(){
-      this.dialogFormVisible= true;
-      this.$nextTick(function(){
+    handleAdd() {
+      this.title = "新增会员";
+      this.dialogFormVisible = true;
+      this.$nextTick(function() {
         this.$refs["memberEdit"].resetFields();
-      })
+      });
       // console.log(this.$refs["memberEdit"])
     },
     //提交表单
-    submitData(formName){
-      this.$refs[formName].validate((valid)=>{
-        if(valid){
-          MemberApi.addMember(this.form).then(res=>{
-            console.log(res)
-            if(res.data.data.code == "200"){
-              this.fetchData();
-            }else{
-              this.$message({
-                text : res.data.data.message
-              })
-            }
-          }).catch(error=>{
-            console.log(error)
-          })
+    submitData(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          MemberApi.addMember(this.form)
+            .then(res => {
+              console.log(res);
+              if (res.data.data.code == "200") {
+                this.fetchData();
+              } else {
+                this.$message({
+                  text: res.data.data.message
+                });
+              }
+            })
+            .catch(error => {
+              console.log(error);
+            });
         }
         return false;
-      })
-      this.dialogFormVisible= false;
+      });
+      this.dialogFormVisible = false;
     },
     //重置表单
     resetForm(formName) {
@@ -212,10 +223,83 @@ export default {
     onSubmit() {
       this.fetchData();
     },
+    //更新数据方法
+    updatedData(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          MemberApi.updatedMember(this.form.id,this.form).then(res => {
+            if (res.data.code == 200) {
+              this.fetchData();
+              this.$message({
+                text: "数据更新成功"
+              });
+            } else {
+              this.$message({
+                text: "数据更新失败"
+              });
+            }
+          });
+        }else{
+          return false;
+        }
+      });
+
+      this.dialogFormVisible = false;
+    },
     //编辑
-    handleEdit() {},
+    handleEdit(index) {
+      this.title = "编辑会员";
+      MemberApi.findMember(index)
+        .then(res => {
+          console.log(res);
+          if (res.data.data.code == 200) {
+            this.form = res.data.data.data;
+            console.log(this.form);
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      this.dialogFormVisible = true;
+    },
     //删除
-    handleDelete() {},
+    handleDelete(index) {
+      this.$confirm("确认删除这条记录吗？?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(() => {
+          const that = this;
+          MemberApi.removeMember(index)
+            .then(res => {
+              console.log(res);
+              if (res.data.data.code == 200) {
+                that.fetchData();
+                this.$message({
+                  type: "success",
+                  message: res.data.data.message
+                });
+              } else {
+                this.$message({
+                  type: "warning",
+                  message: res.data.data.message
+                });
+              }
+            })
+            .catch(error => {
+              this.$message({
+                type: "warning",
+                message: "请求失败"
+              });
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
+    },
     //条数改变时触发
     handleSizeChange(cSize) {
       console.log("条数");
@@ -262,7 +346,7 @@ export default {
 .el-pagination {
   margin-top: 20px;
 }
-.el-dialog__wrapper /deep/ .el-dialog{
-  width: 39% ;
+.el-dialog__wrapper /deep/ .el-dialog {
+  width: 39%;
 }
 </style>
