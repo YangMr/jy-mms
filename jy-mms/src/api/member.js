@@ -15,5 +15,13 @@ export default {
             method : "POST",
             data : searchMap
         })
+    },
+    //新增会员接口
+    addMember(data){
+        return request({
+            url : "/member",
+            method : "post",
+            data : data
+        })
     }
 }   

@@ -10,14 +10,25 @@
       </el-form-item>
       <el-form-item prop="payType">
         <el-select v-model="searchMap.payType" placeholder="支付类型" style="width:110px">
-          <el-option v-for="(item,index) in payTypeValue" :key="index" :label="item.name" :value="item.type"></el-option>
+          <el-option
+            v-for="(item,index) in payTypeValue"
+            :key="index"
+            :label="item.name"
+            :value="item.type"
+          ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item prop="birthday">
-        <el-date-picker value-format="yyyy-MM-dd" v-model="searchMap.birthday" type="date" placeholder="出生日期"></el-date-picker>
+        <el-date-picker
+          value-format="yyyy-MM-dd"
+          v-model="searchMap.birthday"
+          type="date"
+          placeholder="出生日期"
+        ></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">查询</el-button>
+        <el-button type="primary" @click="handleAdd">新增</el-button>
         <el-button @click="resetForm('ruleForm')">重置</el-button>
       </el-form-item>
     </el-form>
@@ -53,6 +64,42 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total"
     ></el-pagination>
+    <!-- 新增对话框 -->
+    <el-dialog title="会员编辑" :visible.sync="dialogFormVisible" >
+      <el-form ref="memberEdit" :model="form" :rules="rules" style="width:400px">
+        <el-form-item label="会员卡号" prop="cardNum" :label-width="formLabelWidth">
+          <el-input v-model="form.cardNum" ></el-input>
+        </el-form-item>
+        <el-form-item label="会员姓名" prop="name" :label-width="formLabelWidth">
+          <el-input v-model="form.name" ></el-input>
+        </el-form-item>
+        <el-form-item label="会员生日" prop="birthday" :label-width="formLabelWidth">
+          <el-date-picker  v-model="form.birthday" type="date" placeholder="会员生日"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="手机号码" prop="phone" :label-width="formLabelWidth">
+          <el-input v-model="form.phone" ></el-input>
+        </el-form-item>
+        <el-form-item label="开卡金额" prop="money" :label-width="formLabelWidth">
+          <el-input v-model="form.money" ></el-input>
+        </el-form-item>
+        <el-form-item label="可用积分" prop="intergal" :label-width="formLabelWidth">
+          <el-input v-model="form.intergal" ></el-input>
+        </el-form-item>
+        <el-form-item label="支付类型" prop="payType" :label-width="formLabelWidth">
+          <el-select v-model="form.payType" placeholder="支付类型">
+            <el-option v-for="(item,index) in payTypeValue" :label="item.name" :value="item.type" :key="index"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="会员地址" prop="address" :label-width="formLabelWidth">
+          <el-input v-model="form.address" type="textarea" ></el-input>
+        </el-form-item>
+      </el-form>
+      
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitData('memberEdit')">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -80,17 +127,42 @@ export default {
   name: "",
   data() {
     return {
-      searchMap: {
+      rules : {
+        cardNum : [
+          { required: true, message: '请输入会员卡号', trigger: 'blur' },
+          { min: 3, max: 30, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+        ],
+        name : [
+          { required: true, message: '请输入会员姓名', trigger: 'blur' },
+        ],
+        payType : [
+          { required: true, message: '请选择支付方式', trigger: 'change' }
+        
+        ]
+      },
+      formLabelWidth: "100px",
+      form: {
         cardNum : "",
         name : "",
+        birthday : "",
+        phone : "",
+        money : 0,
+        intergal : 0,
         payType : "",
-        birthday : ""
+        address : ""
+      },
+      dialogFormVisible: false,
+      searchMap: {
+        cardNum: "",
+        name: "",
+        payType: "",
+        birthday: ""
       },
       list: [],
       currentPage: 1,
       pageSize: 10,
       total: 0,
-      payTypeValue : payType
+      payTypeValue: payType
     };
   },
   components: {},
@@ -103,8 +175,37 @@ export default {
     }
   },
   methods: {
+    //显示新增表单
+    handleAdd(){
+      this.dialogFormVisible= true;
+      this.$nextTick(function(){
+        this.$refs["memberEdit"].resetFields();
+      })
+      // console.log(this.$refs["memberEdit"])
+    },
+    //提交表单
+    submitData(formName){
+      this.$refs[formName].validate((valid)=>{
+        if(valid){
+          MemberApi.addMember(this.form).then(res=>{
+            console.log(res)
+            if(res.data.data.code == "200"){
+              this.fetchData();
+            }else{
+              this.$message({
+                text : res.data.data.message
+              })
+            }
+          }).catch(error=>{
+            console.log(error)
+          })
+        }
+        return false;
+      })
+      this.dialogFormVisible= false;
+    },
     //重置表单
-    resetForm(formName){
+    resetForm(formName) {
       this.$refs[formName].resetFields();
     },
     //提交表单
@@ -130,7 +231,11 @@ export default {
     //初始化数据
     fetchData() {
       //请求会员列表的数据
-      MemberApi.getMemberListPage(this.currentPage, this.pageSize,this.searchMap)
+      MemberApi.getMemberListPage(
+        this.currentPage,
+        this.pageSize,
+        this.searchMap
+      )
         .then(res => {
           console.log(res);
           //   console.log(res);
@@ -156,5 +261,8 @@ export default {
 }
 .el-pagination {
   margin-top: 20px;
+}
+.el-dialog__wrapper /deep/ .el-dialog{
+  width: 39% ;
 }
 </style>
